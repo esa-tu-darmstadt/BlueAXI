@@ -66,7 +66,7 @@ module mkAXI4_Master_Rd#(Integer bufferIn, Integer bufferOut, Bool bram)(AXI4_Ma
     else
         in <- mkSizedFIFOF(bufferIn);
 
-    FIFOF#(AXI4_Read_Rs#(datawidth, id_width, user_width)) out <- mkSizedFIFOF(bufferOut);
+    FIFOF#(AXI4_Read_Rs#(datawidth, id_width, user_width)) out = ?;
     if(bufferOut == 0)
         out <- mkBypassFIFOF();
     else if(bufferOut == 1)
