@@ -34,7 +34,10 @@ module mkBlueAXIBRAM#(BRAMServerBE#(Bit#(bram_addr_type_sz), Bit#(bram_data_type
         let addr = addr_counter_write >> valueOf(TLog#(TDiv#(data_width, 8)));
 
         Bit#(bram_addr_type_sz) regNum = zExtend(addr);
-        bramPort.request.put(BRAMRequestBE {writeen: zExtend(r.strb), responseOnWrite: False, address: regNum, datain: zExtend(r.data)});
+
+        if(r.strb != 0) begin
+            bramPort.request.put(BRAMRequestBE {writeen: zExtend(r.strb), responseOnWrite: False, address: regNum, datain: zExtend(r.data)});
+        end
 
         if(transfers_left_write == 1) begin
             slave_wr.response.put(AXI4_Write_Rs {id: cur_id_write, resp: OKAY, user: 0});
