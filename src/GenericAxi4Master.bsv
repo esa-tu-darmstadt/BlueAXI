@@ -340,8 +340,11 @@ module mkAxi4MasterRead#(Integer requestBuffer, Integer dataBuffer, Bool bram, I
 
         maxOutstandingFIFO.enq(True);
 
+        Bit#(12) actual_burst_length = extend(beatsThisRequest) + 1;
+        Bit#(12) actual_bytes = (fromInteger(valueof(data_bytes)) * actual_burst_length);
+
         if(always_offset) begin
-            task_data_requests_reg_new.offset_first = task_data_requests_reg.offset_first + bytesPerFullBurst();
+            task_data_requests_reg_new.offset_first = task_data_requests_reg.offset_first + actual_bytes;
             if(task_data_requests_reg_new.offset_first <= task_data_requests_reg.offset_first) begin
                 task_data_requests_reg_new.address_dynamic = task_data_requests_reg.address_dynamic + 1;
             end
@@ -595,9 +598,13 @@ module mkAxi4MasterWrite#(Integer requestBuffer, Integer dataBuffer, Bool bram, 
 
         beatsPerRequestFIFO.enq(beatsThisRequest);
 
+        //calculate how many bytes will be transferred 
+        Bit#(12) actual_burst_length = extend(beatsThisRequest) + 1;
+        Bit#(12) actual_bytes = (fromInteger(valueof(data_bytes)) * actual_burst_length);
+
         task_data_requests_reg_new.requests_total = task_data_requests_reg.requests_total - 1;
         if(always_offset) begin
-            task_data_requests_reg_new.offset_first = task_data_requests_reg.offset_first + bytesPerFullBurst();
+            task_data_requests_reg_new.offset_first = task_data_requests_reg.offset_first + actual_bytes;
             if(task_data_requests_reg_new.offset_first <= task_data_requests_reg.offset_first) begin
                 task_data_requests_reg_new.address_dynamic = task_data_requests_reg.address_dynamic + 1;
             end
