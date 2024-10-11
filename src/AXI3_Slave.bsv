@@ -130,7 +130,13 @@ module mkAXI3_Slave_Rd_Dummy(AXI3_Slave_Rd#(addrwidth, datawidth, id_width));
         interface rdata = unpack(0);
         interface rresp = unpack(0);
         interface rlast = unpack(0);
+
+        interface prready = ?;
+        interface parchannel = ?;
+        interface parvalid = ?;
     endinterface
+    interface response = ?;
+    interface request = ?;
 endmodule
 
 /*
@@ -171,7 +177,9 @@ interface AXI3_Slave_Wr#(numeric type addrwidth, numeric type datawidth, numeric
   interface AXI3_Slave_Wr_Fab#(addrwidth, datawidth, id_width) fab;
 
   interface Get#(AXI3_Write_Rq_Addr#(addrwidth, id_width)) request_addr;
+  method AXI3_Write_Rq_Addr#(addrwidth, id_width) snoop_addr();
   interface Get#(AXI3_Write_Rq_Data#(datawidth, id_width)) request_data;
+  method AXI3_Write_Rq_Data#(datawidth, id_width) snoop_data();
 
   interface Put#(AXI3_Write_Rs#(id_width)) response;
 endinterface
@@ -259,6 +267,9 @@ module mkAXI3_Slave_Wr#(Integer bufferSizeAddr, Integer bufferSizeData, Integer 
         wbresp <= out.first().resp();
     endrule
 
+    method snoop_addr = in_addr.first;
+    method snoop_data = in_data.first;
+
     interface Get request_addr = toGet(in_addr);
     interface Get request_data = toGet(in_data);
     interface Put response = toPut(out);
@@ -288,7 +299,17 @@ module mkAXI3_Slave_Wr_Dummy(AXI3_Slave_Wr#(addrwidth, datawidth, id_width));
         interface bvalid = False;
         interface bresp = unpack(0);
         interface bid = unpack(0);
+        interface pawvalid = ?;
+        interface pawchannel = ?;
+        interface pwvalid = ?;
+        interface pwchannel = ?;
+        interface pbready = ?;
     endinterface
+    interface response = ?;
+    interface request_addr = ?;
+    interface snoop_addr = ?;
+    interface request_data = ?;
+    interface snoop_data = ?;
 endmodule
 
 endpackage

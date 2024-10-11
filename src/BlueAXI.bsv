@@ -1,13 +1,9 @@
 package BlueAXI;
 
-import AXI4_Lite_Types :: *;
-import AXI4_Lite_Master :: *;
-import AXI4_Lite_Slave :: *;
+import AXI4_Lite :: *;
 import GenericAxi4LiteSlave :: *;
 
-import AXI4_Types :: *;
-import AXI4_Master :: *;
-import AXI4_Slave :: *;
+import AXI4 :: *;
 import AXI4_Stream :: *;
 import GenericAxi4Master :: *;
 
@@ -16,13 +12,9 @@ import BlueAXIBRAM :: *;
 
 import AXI4_Monitor :: *;
 
-import AXI3_Types :: *;
-import AXI3_Master :: *;
-import AXI3_Slave :: *;
+import AXI3 :: *;
 
-export AXI4_Lite_Types :: *;
-export AXI4_Lite_Master :: *;
-export AXI4_Lite_Slave :: *;
+export AXI4_Lite :: *;
 export GenericAxi4LiteSlave :: *;
 
 export AXI4_Types :: *;
