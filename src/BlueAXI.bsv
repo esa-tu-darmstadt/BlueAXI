@@ -17,10 +17,7 @@ import AXI3 :: *;
 export AXI4_Lite :: *;
 export GenericAxi4LiteSlave :: *;
 
-export AXI4_Types :: *;
-export AXI4_Master :: *;
-export AXI4_Slave :: *;
-export AXI4_Stream :: *;
+export AXI4 :: *;
 export GenericAxi4Master :: *;
 
 export BlueAXITests :: *;
@@ -28,8 +25,6 @@ export BlueAXIBRAM :: *;
 
 export AXI4_Monitor :: *;
 
-export AXI3_Types :: *;
-export AXI3_Master :: *;
-export AXI3_Slave :: *;
+export AXI3 :: *;
 
 endpackage
