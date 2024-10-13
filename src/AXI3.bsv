@@ -1,8 +1,8 @@
 package AXI3;
 
 import GetPut :: *;
-import ClientServerS :: *;
 import Connectable :: *;
+import ClientServer :: *;
 
 import AXI3_Types :: *;
 import AXI3_Slave :: *;
@@ -26,11 +26,11 @@ interface AXI3_Master_Fab#(numeric type addrwidth, numeric type datawidth, numer
     interface AXI3_Master_Wr_Fab#(addrwidth, datawidth, id_width) wr;
 endinterface
 
-typedef ServerS#(AXI3_Read_Rq#(addrwidth, id_width), AXI3_Read_Rs#(datawidth, id_width)) AXI3_Read_Server#(numeric type addrwidth, numeric type datawidth, numeric type id_width);
+typedef Server#(AXI3_Read_Rq#(addrwidth, id_width), AXI3_Read_Rs#(datawidth, id_width)) AXI3_Read_Server#(numeric type addrwidth, numeric type datawidth, numeric type id_width);
 interface AXI3_Write_Server#(numeric type addrwidth, numeric type datawidth, numeric type id_width);
     interface Put#(AXI3_Write_Rq_Addr#(addrwidth, id_width)) request_addr;
     interface Put#(AXI3_Write_Rq_Data#(datawidth, id_width)) request_data;
-    interface GetS#(AXI3_Write_Rs#(id_width)) response;
+    interface Get#(AXI3_Write_Rs#(id_width)) response;
 endinterface
 
 interface AXI3_Master#(numeric type addrwidth, numeric type datawidth, numeric type id_width);
@@ -48,16 +48,11 @@ module mkAXI3_Master#(Integer bufferInRead, Integer bufferOutRead, Bool bramRead
 		interface rd = rd_master.fab;
 		interface wr = wr_master.fab;
 	endinterface
-	interface read = toGPServerS(rd_master.request, rd_master.response);
+	interface read = toGPServer(rd_master.request, rd_master.response);
 	interface AXI3_Write_Server write;
         interface request_addr = wr_master.request_addr;
         interface request_data = wr_master.request_data;
-        interface GetS response;
-            method first = wr_master.snoop;
-            method Action deq();
-                let r <- wr_master.response.get;
-            endmethod
-        endinterface
+        interface response = wr_master.response;
     endinterface
 endmodule
 
@@ -75,10 +70,10 @@ interface AXI3_Slave_Fab#(numeric type addrwidth, numeric type datawidth, numeri
 endinterface
 
 
-typedef ClientS#(AXI3_Read_Rq#(addrwidth, id_width), AXI3_Read_Rs#(datawidth, id_width)) AXI3_Read_Client#(numeric type addrwidth, numeric type datawidth, numeric type id_width);
+typedef Client#(AXI3_Read_Rq#(addrwidth, id_width), AXI3_Read_Rs#(datawidth, id_width)) AXI3_Read_Client#(numeric type addrwidth, numeric type datawidth, numeric type id_width);
 interface AXI3_Write_Client#(numeric type addrwidth, numeric type datawidth, numeric type id_width);
-    interface GetS#(AXI3_Write_Rq_Addr#(addrwidth, id_width)) request_addr;
-    interface GetS#(AXI3_Write_Rq_Data#(datawidth, id_width)) request_data;
+    interface Get#(AXI3_Write_Rq_Addr#(addrwidth, id_width)) request_addr;
+    interface Get#(AXI3_Write_Rq_Data#(datawidth, id_width)) request_data;
     interface Put#(AXI3_Write_Rs#(id_width)) response;
 endinterface
 
@@ -97,20 +92,10 @@ module mkAXI3_Slave#(Integer bufferInRead, Integer bufferOutRead, Integer buffer
 		interface rd = rd_slave.fab;
 		interface wr = wr_slave.fab;
 	endinterface
-	interface read = toGPClientS(rd_slave.request, rd_slave.response);
+	interface read = toGPClient(rd_slave.request, rd_slave.response);
 	interface AXI3_Write_Client write;
-        interface GetS request_addr;
-            method first = wr_slave.snoop_addr;
-            method Action deq();
-                let r <- wr_slave.request_addr.get;
-            endmethod
-        endinterface
-        interface GetS request_data;
-            method first = wr_slave.snoop_data;
-            method Action deq();
-                let r <- wr_slave.request_data.get;
-            endmethod
-        endinterface
+        interface request_addr = wr_slave.request_addr;
+        interface request_data = wr_slave.request_data;
         interface response = wr_slave.response;
     endinterface
 endmodule

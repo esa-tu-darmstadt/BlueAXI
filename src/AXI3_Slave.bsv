@@ -42,6 +42,7 @@ interface AXI3_Slave_Rd#(numeric type addrwidth, numeric type datawidth, numeric
   interface AXI3_Slave_Rd_Fab#(addrwidth, datawidth, id_width) fab;
 
   interface Get#(AXI3_Read_Rq#(addrwidth, id_width)) request;
+  method AXI3_Read_Rq#(addrwidth, id_width) snoop;
   interface Put#(AXI3_Read_Rs#(datawidth, id_width)) response;
 endinterface
 
@@ -105,6 +106,8 @@ module mkAXI3_Slave_Rd#(Integer bufferIn, Integer bufferOut)(AXI3_Slave_Rd#(addr
         wrlast <= out.first().last();
     endrule
 
+    method snoop = in.first;
+
     interface Get request = toGet(in);
     interface Put response = toPut(out);
 
@@ -137,6 +140,7 @@ module mkAXI3_Slave_Rd_Dummy(AXI3_Slave_Rd#(addrwidth, datawidth, id_width));
     endinterface
     interface response = ?;
     interface request = ?;
+    interface snoop = ?;
 endmodule
 
 /*

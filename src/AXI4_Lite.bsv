@@ -4,7 +4,6 @@ import AXI4_Lite_Master :: *;
 import AXI4_Lite_Slave :: *;
 import AXI4_Lite_Types :: *;
 import ClientServer :: *;
-import ClientServerS :: *;
 import GetPut :: *;
 import Connectable :: *;
 
@@ -62,15 +61,14 @@ interface AXI4_Lite_Slave_Fab#(numeric type addrwidth, numeric type datawidth);
 endinterface
 
 
-typedef ClientS#(AXI4_Lite_Read_Rq_Pkg#(addrwidth), AXI4_Lite_Read_Rs_Pkg#(datawidth)) AXI4_Lite_Read_Client#(numeric type addrwidth, numeric type datawidth);
-typedef ClientS#(AXI4_Lite_Write_Rq_Pkg#(addrwidth, datawidth), AXI4_Lite_Write_Rs_Pkg) AXI4_Lite_Write_Client#(numeric type addrwidth, numeric type datawidth);
+typedef Client#(AXI4_Lite_Read_Rq_Pkg#(addrwidth), AXI4_Lite_Read_Rs_Pkg#(datawidth)) AXI4_Lite_Read_Client#(numeric type addrwidth, numeric type datawidth);
+typedef Client#(AXI4_Lite_Write_Rq_Pkg#(addrwidth, datawidth), AXI4_Lite_Write_Rs_Pkg) AXI4_Lite_Write_Client#(numeric type addrwidth, numeric type datawidth);
 
 interface AXI4_Lite_Slave#(numeric type addrwidth, numeric type datawidth);
 	interface AXI4_Lite_Slave_Fab#(addrwidth, datawidth) fab;
 	interface AXI4_Lite_Read_Client#(addrwidth, datawidth) read;
 	interface AXI4_Lite_Write_Client#(addrwidth, datawidth) write;
 endinterface
-
 
 module mkAXI4_Lite_Slave#(Integer bufferSizeRead, Integer bufferSizeWrite)(AXI4_Lite_Slave#(addrwidth, datawidth));
 	AXI4_Lite_Slave_Rd#(addrwidth, datawidth) rd_slave <- mkAXI4_Lite_Slave_Rd(bufferSizeRead);
@@ -80,8 +78,8 @@ module mkAXI4_Lite_Slave#(Integer bufferSizeRead, Integer bufferSizeWrite)(AXI4_
 		interface rd = rd_slave.fab;
 		interface wr = wr_slave.fab;
 	endinterface
-	interface read = toGPClientS(rd_slave.request, rd_slave.response);
-	interface write = toGPClientS(wr_slave.request, wr_slave.response);
+	interface read = toGPClient(rd_slave.request, rd_slave.response);
+	interface write = toGPClient(wr_slave.request, wr_slave.response);
 endmodule
 
 /*
