@@ -46,6 +46,7 @@ interface AXI4_Slave_Rd#(numeric type addrwidth, numeric type datawidth, numeric
   interface AXI4_Slave_Rd_Fab#(addrwidth, datawidth, id_width, user_width) fab;
 
   interface Get#(AXI4_Read_Rq#(addrwidth, id_width, user_width)) request;
+  method AXI4_Read_Rq#(addrwidth, id_width, user_width) snoop;
   interface Put#(AXI4_Read_Rs#(datawidth, id_width, user_width)) response;
 endinterface
 
@@ -114,6 +115,8 @@ module mkAXI4_Slave_Rd#(Integer bufferIn, Integer bufferOut)(AXI4_Slave_Rd#(addr
         wruser <= out.first().user();
     endrule
 
+    method snoop = in.first;
+
     interface Get request = toGet(in);
     interface Put response = toPut(out);
 
@@ -141,7 +144,13 @@ module mkAXI4_Slave_Rd_Dummy(AXI4_Slave_Rd#(addrwidth, datawidth, id_width, user
         interface rresp = unpack(0);
         interface rlast = unpack(0);
         interface ruser = unpack(0);
+        interface prready = ?;
+        interface parchannel = ?;
+        interface parvalid = ?;
     endinterface
+    interface response = ?;
+    interface request = ?;
+    interface snoop = ?;
 endmodule
 
 /*
@@ -186,7 +195,9 @@ interface AXI4_Slave_Wr#(numeric type addrwidth, numeric type datawidth, numeric
   interface AXI4_Slave_Wr_Fab#(addrwidth, datawidth, id_width, user_width) fab;
 
   interface Get#(AXI4_Write_Rq_Addr#(addrwidth, id_width, user_width)) request_addr;
+  method AXI4_Write_Rq_Addr#(addrwidth, id_width, user_width) snoop_addr;
   interface Get#(AXI4_Write_Rq_Data#(datawidth, user_width)) request_data;
+  method AXI4_Write_Rq_Data#(datawidth, user_width) snoop_data;
 
   interface Put#(AXI4_Write_Rs#(id_width, user_width)) response;
 endinterface
@@ -279,6 +290,9 @@ module mkAXI4_Slave_Wr#(Integer bufferSizeAddr, Integer bufferSizeData, Integer 
         wbuser <= out.first().user();
     endrule
 
+    method snoop_addr = in_addr.first;
+    method snoop_data = in_data.first;
+
     interface Get request_addr = toGet(in_addr);
     interface Get request_data = toGet(in_data);
     interface Put response = toPut(out);
@@ -310,7 +324,17 @@ module mkAXI4_Slave_Wr_Dummy(AXI4_Slave_Wr#(addrwidth, datawidth, id_width, user
         interface bresp = unpack(0);
         interface bid = unpack(0);
         interface buser = unpack(0);
+        interface pbready = ?;
+        interface pwchannel = ?;
+        interface pwvalid = ?;
+        interface pawchannel = ?;
+        interface pawvalid = ?;
     endinterface
+    interface response = ?;
+    interface request_data = ?;
+    interface request_addr = ?;
+    interface snoop_data = ?;
+    interface snoop_addr = ?;
 endmodule
 
 endpackage
