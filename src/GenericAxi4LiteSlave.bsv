@@ -61,7 +61,7 @@ function Action bramWriter(Integer start, BRAMServerBE#(a, b, c) bramPort,
     action
         addr = addr - fromInteger(start);
         Bit#(a_sz) regNum = zExtend(addr >> valueOf(TLog#(TDiv#(b_sz, 8))));
-        bramPort.request.put(BRAMRequestBE {writeen: s, responseOnWrite: False, address: unpack(regNum), datain: unpack(d)});
+        if(s!=0) bramPort.request.put(BRAMRequestBE {writeen: s, responseOnWrite: False, address: unpack(regNum), datain: unpack(d)});
     endaction
 endfunction
 
