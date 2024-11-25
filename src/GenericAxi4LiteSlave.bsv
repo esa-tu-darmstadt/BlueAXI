@@ -323,8 +323,6 @@ module mkGenericAxi4LiteSlave#(List#(RegisterOperator#(axiAddrWidth, axiDataWidt
         endrule
     endrules);
 
-    addRules(readRules);
-
     Wire#(Bool) writeIsHandled <- mkDWire(False);
     Reg#(Bool) writeBusy <- mkReg(False);
 
@@ -404,7 +402,7 @@ module mkGenericAxi4LiteSlave#(List#(RegisterOperator#(axiAddrWidth, axiDataWidt
         endrule
     endrules);
 
-    addRules(writeRules);
+    addRules(rJoinDescendingUrgency(readRules, writeRules));
 
     interface s_rd  = readSlave.fab;
     interface s_wr  = writeSlave.fab;
