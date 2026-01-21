@@ -9,8 +9,7 @@ import SpecialFIFOs :: *;
 import Vector :: *;
 import BUtils :: *;
 
-import AXI4_Types :: *;
-import AXI4_Master :: *;
+import AXI4 :: *;
 
 typedef struct {
     Bit#(addr_width)  address;

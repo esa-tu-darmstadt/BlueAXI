@@ -223,7 +223,15 @@ module mkAXI4_Lite_Slave_Rd_Dummy(AXI4_Lite_Slave_Rd#(addrwidth, datawidth));
         interface rvalid = False;
         interface rdata = unpack(0);
         interface rresp = unpack(0);
+
+		interface prready = ?;
+		interface parprot = ?;
+		interface paraddr = ?;
+		interface parvalid = ?;
     endinterface
+	interface response = ?;
+	interface first = ?;
+	interface request = ?;
 endmodule
 
 module mkAXI4_Lite_Slave_Wr_Dummy(AXI4_Lite_Slave_Wr#(addrwidth, datawidth));
@@ -234,7 +242,17 @@ module mkAXI4_Lite_Slave_Wr_Dummy(AXI4_Lite_Slave_Wr#(addrwidth, datawidth));
 
         interface bvalid = False;
         interface bresp = unpack(0);
+		interface pbready = ?;
+		interface pwstrb = ?;
+		interface pwdata = ?;
+		interface pwvalid = ?;
+		interface pawprot = ?;
+		interface pawaddr = ?;
+		interface pawvalid = ?;
     endinterface
+	interface response = ?;
+	interface first = ?;
+	interface request = ?;
 endmodule
 
 endpackage

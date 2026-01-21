@@ -213,54 +213,6 @@ module mkAXI4_Lite_Master_Wr#(Integer bufferSize)(AXI4_Lite_Master_Wr#(addrwidth
 	endinterface
 endmodule
 
-/*
-========================
-	Connectable
-========================
-*/
-
-instance Connectable#(AXI4_Lite_Master_Wr_Fab#(addrwidth, datawidth), AXI4_Lite_Slave_Wr_Fab#(addrwidth, datawidth));
-	module mkConnection#(AXI4_Lite_Master_Wr_Fab#(addrwidth, datawidth) master, AXI4_Lite_Slave_Wr_Fab#(addrwidth, datawidth) slave)(Empty);
-		rule forward1; master.pawready(slave.awready); endrule
-		rule forward2; slave.pawvalid(master.awvalid); endrule
-		rule forward3; slave.pawaddr(master.awaddr); endrule
-		rule forward4; slave.pawprot(master.awprot); endrule
-		rule forward5; master.pwready(slave.wready); endrule
-		rule forward6; slave.pwvalid(master.wvalid); endrule
-		rule forward7; slave.pwdata(master.wdata); endrule
-		rule forward8; slave.pwstrb(master.wstrb); endrule
-		rule forward9; master.pbvalid(slave.bvalid); endrule
-		rule forward10; slave.pbready(master.bready); endrule
-		rule forward11; master.pbresp(slave.bresp); endrule
-	endmodule
-endinstance
-
-instance Connectable#(AXI4_Lite_Slave_Wr_Fab#(addrwidth, datawidth), AXI4_Lite_Master_Wr_Fab#(addrwidth, datawidth));
-	module mkConnection#(AXI4_Lite_Slave_Wr_Fab#(addrwidth, datawidth) slave, AXI4_Lite_Master_Wr_Fab#(addrwidth, datawidth) master)(Empty);
-		mkConnection(master, slave);
-	endmodule
-endinstance
-
-instance Connectable#(AXI4_Lite_Master_Rd_Fab#(addrwidth, datawidth), AXI4_Lite_Slave_Rd_Fab#(addrwidth, datawidth));
-	module mkConnection#(AXI4_Lite_Master_Rd_Fab#(addrwidth, datawidth) master, AXI4_Lite_Slave_Rd_Fab#(addrwidth, datawidth) slave)(Empty);
-		rule forward1; slave.parvalid(master.arvalid); endrule
-		rule forward2; master.parready(slave.arready); endrule
-		rule forward3; slave.paraddr(master.araddr); endrule
-		rule forward4; slave.parprot(master.arprot); endrule
-
-		rule forward5; slave.prready(master.rready); endrule
-		rule forward6; master.prvalid(slave.rvalid); endrule
-		rule forward7; master.prdata(slave.rdata); endrule
-		rule forward8; master.prresp(slave.rresp); endrule
-	endmodule
-endinstance
-
-instance Connectable#(AXI4_Lite_Slave_Rd_Fab#(addrwidth, datawidth), AXI4_Lite_Master_Rd_Fab#(addrwidth, datawidth));
-	module mkConnection#(AXI4_Lite_Slave_Rd_Fab#(addrwidth, datawidth) slave, AXI4_Lite_Master_Rd_Fab#(addrwidth, datawidth) master)(Empty);
-		mkConnection(master, slave);
-	endmodule
-endinstance
-
 module mkAXI4_Lite_Master_Rd_Dummy(AXI4_Lite_Master_Rd#(addrwidth, datawidth));
     interface AXI4_Lite_Master_Rd_Fab fab;
     	interface arvalid = False;
@@ -268,7 +220,14 @@ module mkAXI4_Lite_Master_Rd_Dummy(AXI4_Lite_Master_Rd#(addrwidth, datawidth));
     	interface arprot = unpack(0);
 
     	interface rready = False;
+
+		interface prresp = ?;
+		interface prdata = ?;
+		interface prvalid = ?;
+		interface parready = ?;
     endinterface
+	interface response = ?;
+	interface request = ?;
 endmodule
 
 module mkAXI4_Lite_Master_Wr_Dummy(AXI4_Lite_Master_Wr#(addrwidth, datawidth));
@@ -282,7 +241,14 @@ module mkAXI4_Lite_Master_Wr_Dummy(AXI4_Lite_Master_Wr#(addrwidth, datawidth));
     	interface wstrb = unpack(0);
 
     	interface bready = False;
+
+		interface pawready = ?;
+		interface pbresp = ?;
+		interface pbvalid = ?;
+		interface pwready = ?;
     endinterface
+	interface response = ?;
+	interface request = ?;
 endmodule
 
 function Action axi4_lite_write(AXI4_Lite_Master_Wr#(a, d) m,

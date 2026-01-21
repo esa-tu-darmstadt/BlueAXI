@@ -15,7 +15,7 @@ import AXI3_Slave :: *;
 
 /*
 ========================
-    AXI 4 Master Read
+    AXI 3 Master Read
 ========================
 */
 
@@ -136,7 +136,7 @@ endmodule
 
 /*
 ========================
-    AXI 4 Lite Master Write
+    AXI 3 Master Write
 ========================
 */
 (* always_ready, always_enabled *)
@@ -317,56 +317,7 @@ endinterface
 //    //interface s_rd = slave_rd.fab;
 //endmodule
 //
-/*
-========================
-    Connectable
-========================
-*/
-instance Connectable#(AXI3_Master_Rd_Fab#(addrwidth, datawidth, id_width), AXI3_Slave_Rd_Fab#(addrwidth, datawidth, id_width));
-    module mkConnection#(AXI3_Master_Rd_Fab#(addrwidth, datawidth, id_width) master, AXI3_Slave_Rd_Fab#(addrwidth, datawidth, id_width) slave)(Empty);
-        rule forward1; master.parready(slave.arready); endrule
-        rule forward2; slave.parvalid(master.arvalid); endrule
-        rule forward3;
-            slave.parchannel(master.arid, master.araddr, master.arlen, master.arsize, master.arburst,
-                master.arlock, master.arcache, master.arprot);
-        endrule
 
-        rule forward4; master.prvalid(slave.rvalid); endrule
-        rule forward5; slave.prready(master.rready); endrule
-
-        rule forward6;
-            master.prchannel(slave.rid, slave.rdata, slave.rresp, slave.rlast);
-        endrule
-    endmodule
-endinstance
-
-instance Connectable#(AXI3_Slave_Rd_Fab#(addrwidth, datawidth, id_width), AXI3_Master_Rd_Fab#(addrwidth, datawidth, id_width));
-    module mkConnection#(AXI3_Slave_Rd_Fab#(addrwidth, datawidth, id_width) slave, AXI3_Master_Rd_Fab#(addrwidth, datawidth, id_width) master)(Empty);
-        mkConnection(master, slave);
-    endmodule
-endinstance
-
-instance Connectable#(AXI3_Master_Wr_Fab#(addrwidth, datawidth, id_width), AXI3_Slave_Wr_Fab#(addrwidth, datawidth, id_width));
-    module mkConnection#(AXI3_Master_Wr_Fab#(addrwidth, datawidth, id_width) master, AXI3_Slave_Wr_Fab#(addrwidth, datawidth, id_width) slave)(Empty);
-        rule forward1; master.pawready(slave.awready); endrule
-        rule forward2; slave.pawvalid(master.awvalid); endrule
-        rule forward3; slave.pawchannel(master.awid, master.awaddr, master.awlen, master.awsize, master.awburst, master.awlock, master.awcache, master.awprot); endrule
-
-        rule forward4; master.pwready(slave.wready); endrule
-        rule forward5; slave.pwvalid(master.wvalid); endrule
-        rule forward6; slave.pwchannel(master.wid, master.wdata, master.wstrb, master.wlast); endrule
-
-        rule forward7; master.pbvalid(slave.bvalid); endrule
-        rule forward8; slave.pbready(master.bready); endrule
-        rule forward9; master.bin(slave.bresp, slave.bid); endrule
-    endmodule
-endinstance
-
-instance Connectable#(AXI3_Slave_Wr_Fab#(addrwidth, datawidth, id_width), AXI3_Master_Wr_Fab#(addrwidth, datawidth, id_width));
-    module mkConnection#(AXI3_Slave_Wr_Fab#(addrwidth, datawidth, id_width) slave, AXI3_Master_Wr_Fab#(addrwidth, datawidth, id_width) master)(Empty);
-        mkConnection(master, slave);
-    endmodule
-endinstance
 
 module mkAXI3_Master_Rd_Dummy(AXI3_Master_Rd#(addrwidth, datawidth, id_width));
     interface AXI3_Master_Rd_Fab fab;
@@ -393,6 +344,9 @@ module mkAXI3_Master_Rd_Dummy(AXI3_Master_Rd#(addrwidth, datawidth, id_width));
         method Action parready(Bool a);
         endmethod
   endinterface
+  interface snoop = ?;
+  interface response = ?;
+  interface request = ?;
 endmodule
 
 module mkAXI3_Master_Wr_Dummy(AXI3_Master_Wr#(addrwidth, datawidth, id_width));
@@ -422,7 +376,12 @@ module mkAXI3_Master_Wr_Dummy(AXI3_Master_Wr#(addrwidth, datawidth, id_width));
         endmethod
         method Action bin(AXI3_Response r, Bit#(id_width) bid);
         endmethod
+        interface wid = ?;
     endinterface
+    interface snoop = ?;
+    interface response = ?;
+    interface request_data = ?;
+    interface request_addr = ?;
 endmodule
 
 // Helper functions to simplify usage of the above modules
