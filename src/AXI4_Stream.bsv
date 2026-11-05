@@ -66,14 +66,11 @@ module mkAXI4_Stream_Rd#(Integer bufferSize)(AXI4_Stream_Rd#(datawidth, userwidt
 	Wire#(Bit#(8))	 		          idIn   <- mkBypassWire();
 	Wire#(Bool) 					  lastIn <- mkBypassWire();
 
-	// bufferSize 0: bypass FIFO, a beat passes through in the same cycle
 	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth)) in;
 	if(bufferSize == 0)
 		in <- mkBypassFIFOF();
 	else if(bufferSize == 1)
 		in <- mkPipelineFIFOF();
-	else if(bufferSize == 2)
-		in <- mkFIFOF();
 	else
 		in <- mkSizedFIFOF(bufferSize);
 
@@ -131,14 +128,11 @@ module mkAXI4_Stream_Wr#(Integer bufferSize)(AXI4_Stream_Wr#(datawidth, userwidt
 
     let isRst <- isResetAsserted();
 
-	// bufferSize 0: bypass FIFO, a beat passes through in the same cycle
 	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth)) out;
 	if(bufferSize == 0)
 		out <- mkBypassFIFOF();
 	else if(bufferSize == 1)
 		out <- mkPipelineFIFOF();
-	else if(bufferSize == 2)
-		out <- mkFIFOF();
 	else
 		out <- mkSizedFIFOF(bufferSize);
 
