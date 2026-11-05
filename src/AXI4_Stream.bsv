@@ -66,11 +66,13 @@ module mkAXI4_Stream_Rd#(Integer bufferSize)(AXI4_Stream_Rd#(datawidth, userwidt
 	Wire#(Bit#(8))	 		          idIn   <- mkBypassWire();
 	Wire#(Bool) 					  lastIn <- mkBypassWire();
 
-	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth)) in <- mkSizedFIFOF(bufferSize);
-	if(bufferSize == 1)
+	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth)) in;
+	if(bufferSize == 0)
+		in <- mkBypassFIFOF();
+	else if(bufferSize == 1)
 		in <- mkPipelineFIFOF();
-	if(bufferSize == 2)
-		in <- mkFIFOF();
+	else
+		in <- mkSizedFIFOF(bufferSize);
 
 	rule writeFIFO if(!isRst && tvalidIn && in.notFull());
 		AXI4_Stream_Pkg#(datawidth, userwidth) s;
@@ -126,11 +128,13 @@ module mkAXI4_Stream_Wr#(Integer bufferSize)(AXI4_Stream_Wr#(datawidth, userwidt
 
     let isRst <- isResetAsserted();
 
-	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth)) out <- mkSizedFIFOF(bufferSize);
-	if(bufferSize == 1)
+	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth)) out;
+	if(bufferSize == 0)
+		out <- mkBypassFIFOF();
+	else if(bufferSize == 1)
 		out <- mkPipelineFIFOF();
-	if(bufferSize == 2)
-		out <- mkFIFOF();
+	else
+		out <- mkSizedFIFOF(bufferSize);
 
 	Wire#(Bool) treadyIn <- mkBypassWire;
 	Wire#(Bool) tvalidOut <- mkDWire(False);
