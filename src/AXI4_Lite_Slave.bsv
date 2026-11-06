@@ -217,24 +217,53 @@ endmodule
 
 module mkAXI4_Lite_Slave_Rd_Dummy(AXI4_Lite_Slave_Rd#(addrwidth, datawidth));
     interface AXI4_Lite_Slave_Rd_Fab fab;
-
-        interface arready = False;
-
-        interface rvalid = False;
-        interface rdata = unpack(0);
-        interface rresp = unpack(0);
+        method arready           = False;
+        method parvalid(arvalid) = noAction;
+        method paraddr(a)        = noAction;
+        method parprot(p)        = noAction;
+        method rvalid            = False;
+        method prready(rready)   = noAction;
+        method rdata             = unpack(0);
+        method rresp             = unpack(0);
     endinterface
+
+    interface Get request;
+        method get() if(False) = actionvalue return unpack(0); endactionvalue;
+    endinterface
+
+    method first() if(False) = unpack(0);
+
+    interface Put response;
+        method put(value) if(False) = noAction;
+    endinterface
+
 endmodule
 
 module mkAXI4_Lite_Slave_Wr_Dummy(AXI4_Lite_Slave_Wr#(addrwidth, datawidth));
     interface AXI4_Lite_Slave_Wr_Fab fab;
-        interface awready = False;
-
-        interface wready = False;
-
-        interface bvalid = False;
-        interface bresp = unpack(0);
+        method awready           = False;
+        method pawvalid(awvalid) = noAction;
+        method pawaddr(a)        = noAction;
+        method pawprot(p)        = noAction;
+        method wready            = False;
+        method pwvalid(wvalid)   = noAction;
+        method pwdata(a)         = noAction;
+        method pwstrb(p)         = noAction;
+        method bvalid            = False;
+        method pbready(b)        = noAction;
+        method bresp             = unpack(0);
     endinterface
+
+    interface Get request;
+        method get() if(False) = actionvalue return unpack(0); endactionvalue;
+    endinterface
+
+    method first() if(False) = unpack(0);
+
+    interface Put response;
+        method put(value) if(False) = noAction;
+    endinterface
+
 endmodule
 
 endpackage

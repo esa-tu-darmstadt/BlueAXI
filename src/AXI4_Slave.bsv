@@ -134,14 +134,26 @@ endmodule
 
 module mkAXI4_Slave_Rd_Dummy(AXI4_Slave_Rd#(addrwidth, datawidth, id_width, user_width));
     interface AXI4_Slave_Rd_Fab fab;
-        interface arready = False;
-        interface rvalid = False;
-        interface rid = unpack(0);
-        interface rdata = unpack(0);
-        interface rresp = unpack(0);
-        interface rlast = unpack(0);
-        interface ruser = unpack(0);
+        method parvalid(v) = noAction;
+        method arready     = False;
+        method parchannel(id, addr, burst_length, burst_size, burst_type, lock, cache, prot, qos, region, user) = noAction;
+        method prready(r)  = noAction;
+        method rvalid      = False;
+        method rid         = unpack(0);
+        method rdata       = unpack(0);
+        method rresp       = unpack(0);
+        method rlast       = unpack(0);
+        method ruser       = unpack(0);
     endinterface
+
+    interface Get request;
+        method get() if(False) = actionvalue return unpack(0); endactionvalue;
+    endinterface
+
+    interface Put response;
+        method put(value) if(False) = noAction;
+    endinterface
+
 endmodule
 
 /*
@@ -301,16 +313,32 @@ module mkAXI4_Slave_Wr#(Integer bufferSizeAddr, Integer bufferSizeData, Integer 
 endmodule
 
 module mkAXI4_Slave_Wr_Dummy(AXI4_Slave_Wr#(addrwidth, datawidth, id_width, user_width));
-      interface AXI4_Slave_Wr_Fab fab;
-        interface awready = False;
-
-        interface wready = False;
-
-        interface bvalid = False;
-        interface bresp = unpack(0);
-        interface bid = unpack(0);
-        interface buser = unpack(0);
+    interface AXI4_Slave_Wr_Fab fab;
+        method awready     = False;
+        method pawvalid(v) = noAction;
+        method pawchannel(id, addr, burst_length, burst_size, burst_type, lock, cache, prot, qos, region, user) = noAction;
+        method wready      = False;
+        method pwvalid(r)  = noAction;
+        method pwchannel(data, strb, last, user) = noAction;
+        method pbready(r)  = noAction;
+        method bvalid      = False;
+        method bresp       = unpack(0);
+        method bid         = unpack(0);
+        method buser       = unpack(0);
     endinterface
+
+    interface Get request_addr;
+        method get() if(False) = actionvalue return unpack(0); endactionvalue;
+    endinterface
+
+    interface Get request_data;
+        method get() if(False) = actionvalue return unpack(0); endactionvalue;
+    endinterface
+
+    interface Put response;
+        method put(value) if(False) = noAction;
+    endinterface
+
 endmodule
 
 endpackage

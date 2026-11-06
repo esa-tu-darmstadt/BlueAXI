@@ -370,59 +370,70 @@ endinstance
 
 module mkAXI3_Master_Rd_Dummy(AXI3_Master_Rd#(addrwidth, datawidth, id_width));
     interface AXI3_Master_Rd_Fab fab;
-        interface arvalid = False;
-        interface arid = unpack(0);
-        interface araddr = unpack(0);
-        interface arlen = unpack(0);
-        interface arsize = unpack(0);
-        interface arburst = unpack(0) ;
-        interface arlock = unpack(0);
-        interface arcache = unpack(0) ;
-        interface arprot = unpack(0);
+        method arvalid     = False;
+        method parready(a) = noAction;
+        method arid        = unpack(0);
+        method araddr      = unpack(0);
+        method arlen       = unpack(0);
+        method arsize      = unpack(0);
+        method arburst     = unpack(0);
+        method arlock      = unpack(0);
+        method arcache     = unpack(0);
+        method arprot      = unpack(0);
+        method rready      = False;
+        method prvalid(v)  = noAction;
+        method prchannel(id, d, resp, last) = noAction;
+    endinterface
 
-        interface rready = False;
+    interface Put request;
+        method put(value) if(False) = noAction;
+    endinterface
 
-        method Action prvalid(Bool v);
-        endmethod
-        method Action prchannel(Bit#(id_width) id,
-                                            Bit#(datawidth) d,
-                                            AXI3_Response resp,
-                                            Bool last);
-        endmethod
+    interface Get response;
+        method get() if(False) = actionvalue return unpack(0); endactionvalue;
+    endinterface
 
-        method Action parready(Bool a);
-        endmethod
-  endinterface
+    method snoop() if(False) = unpack(0);
+
 endmodule
 
 module mkAXI3_Master_Wr_Dummy(AXI3_Master_Wr#(addrwidth, datawidth, id_width));
     interface AXI3_Master_Wr_Fab fab;
-        interface awvalid   = False;
-        interface awid      = unpack(0);
-        interface awaddr    = unpack(0);
-        interface awlen     = unpack(0);
-        interface awsize    = unpack(0);
-        interface awburst   = unpack(0);
-        interface awlock    = unpack(0);
-        interface awcache   = unpack(0);
-        interface awprot    = unpack(0);
-
-        interface wvalid    = False;
-        interface wdata     = unpack(0);
-        interface wstrb     = unpack(0);
-        interface wlast     = unpack(0);
-
-        interface bready = False;
-
-        method Action pawready(Bool r);
-        endmethod
-        method Action pwready(Bool r);
-        endmethod
-        method Action pbvalid(Bool b);
-        endmethod
-        method Action bin(AXI3_Response r, Bit#(id_width) bid);
-        endmethod
+        method pawready(r) = noAction;
+        method awvalid     = False;
+        method awid        = unpack(0);
+        method awaddr      = unpack(0);
+        method awlen       = unpack(0);
+        method awsize      = unpack(0);
+        method awburst     = unpack(0);
+        method awlock      = unpack(0);
+        method awcache     = unpack(0);
+        method awprot      = unpack(0);
+        method pwready(r)  = noAction;
+        method wvalid      = False;
+        method wid         = unpack(0);
+        method wdata       = unpack(0);
+        method wstrb       = unpack(0);
+        method wlast       = unpack(0);
+        method pbvalid(b)  = noAction;
+        method bready      = False;
+        method bin(r, bid) = noAction;
     endinterface
+
+    interface Put request_addr;
+        method put(value) if(False) = noAction;
+    endinterface
+
+    interface Put request_data;
+        method put(value) if(False) = noAction;
+    endinterface
+
+    interface Get response;
+        method get() if(False) = actionvalue return unpack(0); endactionvalue;
+    endinterface
+
+    method snoop() if(False) = unpack(0);
+
 endmodule
 
 // Helper functions to simplify usage of the above modules
