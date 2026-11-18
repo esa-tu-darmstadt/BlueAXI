@@ -18,16 +18,16 @@ typedef struct {
 		Bit#(datawidth) data;
 		Bit#(userwidth) user;
 		Bit#(TDiv#(datawidth, 8)) keep;
-		Bit#(4) dest;
-		Bit#(8) id;
+		Bit#(destwidth) dest;
+		Bit#(idwidth) id;
 		Bool last;
-	} AXI4_Stream_Pkg#(numeric type datawidth, numeric type userwidth) deriving(Bits, Eq, FShow);
+	} AXI4_Stream_Pkg#(numeric type datawidth, numeric type userwidth, numeric type idwidth, numeric type destwidth) deriving(Bits, Eq, FShow);
 
-typedef AXI4_Stream_Pkg#(32, 1) AXI4_Stream_Pkg_32;
-typedef AXI4_Stream_Pkg#(64, 1) AXI4_Stream_Pkg_64;
-typedef AXI4_Stream_Pkg#(128, 1) AXI4_Stream_Pkg_128;
-typedef AXI4_Stream_Pkg#(256, 1) AXI4_Stream_Pkg_256;
-typedef AXI4_Stream_Pkg#(512, 1) AXI4_Stream_Pkg_512;
+typedef AXI4_Stream_Pkg#(32, 1, 8, 4) AXI4_Stream_Pkg_32;
+typedef AXI4_Stream_Pkg#(64, 1, 8, 4) AXI4_Stream_Pkg_64;
+typedef AXI4_Stream_Pkg#(128, 1, 8, 4) AXI4_Stream_Pkg_128;
+typedef AXI4_Stream_Pkg#(256, 1, 8, 4) AXI4_Stream_Pkg_256;
+typedef AXI4_Stream_Pkg#(512, 1, 8, 4) AXI4_Stream_Pkg_512;
 
 /*
 ========================
@@ -36,24 +36,24 @@ typedef AXI4_Stream_Pkg#(512, 1) AXI4_Stream_Pkg_512;
 */
 
 (* always_ready, always_enabled *)
-interface AXI4_Stream_Rd_Fab#(numeric type datawidth, numeric type userwidth);
+interface AXI4_Stream_Rd_Fab#(numeric type datawidth, numeric type userwidth, numeric type idwidth, numeric type destwidth);
   method Bool tready;
   (*prefix=""*)method Action ptvalid((*port="tvalid"*) Bool tvalid);
   (*prefix=""*)method Action ptdata((*port="tdata"*)Bit#(datawidth) data);
   (*prefix=""*)method Action ptuser((*port="tuser"*)Bit#(userwidth) user);
   (*prefix=""*)method Action ptkeep((*port="tkeep"*)Bit#(TDiv#(datawidth, 8)) keep);
-  (*prefix=""*)method Action ptDest((*port="tDest"*)Bit#(4) dest);
-  (*prefix=""*)method Action ptid((*port="tid"*)Bit#(8) id);
+  (*prefix=""*)method Action ptDest((*port="tDest"*)Bit#(destwidth) dest);
+  (*prefix=""*)method Action ptid((*port="tid"*)Bit#(idwidth) id);
   (*prefix=""*)method Action ptlast((*port="tlast"*)Bool last);
 endinterface
 
-interface AXI4_Stream_Rd#(numeric type datawidth, numeric type userwidth);
+interface AXI4_Stream_Rd#(numeric type datawidth, numeric type userwidth, numeric type idwidth, numeric type destwidth);
   (* prefix="" *)
-  interface AXI4_Stream_Rd_Fab#(datawidth, userwidth) fab;
-  interface Get#(AXI4_Stream_Pkg#(datawidth, userwidth)) pkg;
+  interface AXI4_Stream_Rd_Fab#(datawidth, userwidth, idwidth, destwidth) fab;
+  interface Get#(AXI4_Stream_Pkg#(datawidth, userwidth, idwidth, destwidth)) pkg;
 endinterface
 
-module mkAXI4_Stream_Rd#(Integer bufferSize)(AXI4_Stream_Rd#(datawidth, userwidth))
+module mkAXI4_Stream_Rd#(Integer bufferSize)(AXI4_Stream_Rd#(datawidth, userwidth, idwidth, destwidth))
 	provisos(Div#(datawidth, 8, keepwidth));
 
     let isRst <- isResetAsserted();
@@ -62,11 +62,11 @@ module mkAXI4_Stream_Rd#(Integer bufferSize)(AXI4_Stream_Rd#(datawidth, userwidt
 	Wire#(Bit#(datawidth)) 			  dataIn <- mkBypassWire();
 	Wire#(Bit#(userwidth)) 			  userIn <- mkBypassWire();
 	Wire#(Bit#(keepwidth))	 		  keepIn <- mkBypassWire();
-    Wire#(Bit#(4))	 		          destIn <- mkBypassWire();
-	Wire#(Bit#(8))	 		          idIn   <- mkBypassWire();
+	Wire#(Bit#(destwidth))		  destIn <- mkBypassWire();
+	Wire#(Bit#(idwidth))		  idIn   <- mkBypassWire();
 	Wire#(Bool) 					  lastIn <- mkBypassWire();
 
-	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth)) in;
+	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth, idwidth, destwidth)) in;
 	if(bufferSize == 0)
 		in <- mkBypassFIFOF();
 	else if(bufferSize == 1)
@@ -75,7 +75,7 @@ module mkAXI4_Stream_Rd#(Integer bufferSize)(AXI4_Stream_Rd#(datawidth, userwidt
 		in <- mkSizedFIFOF(bufferSize);
 
 	rule writeFIFO if(!isRst && tvalidIn && in.notFull());
-		AXI4_Stream_Pkg#(datawidth, userwidth) s;
+		AXI4_Stream_Pkg#(datawidth, userwidth, idwidth, destwidth) s;
 		s.data = dataIn;
 		s.user = userIn;
 		s.keep = keepIn;
@@ -106,29 +106,29 @@ endmodule
 */
 
 (* always_ready, always_enabled *)
-interface AXI4_Stream_Wr_Fab#(numeric type datawidth, numeric type userwidth);
+interface AXI4_Stream_Wr_Fab#(numeric type datawidth, numeric type userwidth, numeric type idwidth, numeric type destwidth);
   method Bool tvalid;
   (*prefix=""*)method Action ptready((*port="tready"*) Bool tr);
   method Bit#(datawidth) tdata;
   method Bool tlast;
   method Bit#(userwidth) tuser;
   method Bit#(TDiv#(datawidth, 8)) tkeep;
-  method Bit#(4) tDest;
-  method Bit#(8) tid;
+  method Bit#(destwidth) tDest;
+  method Bit#(idwidth) tid;
 endinterface
 
-interface AXI4_Stream_Wr#(numeric type datawidth, numeric type userwidth);
+interface AXI4_Stream_Wr#(numeric type datawidth, numeric type userwidth, numeric type idwidth, numeric type destwidth);
   (* prefix="" *)
-  interface AXI4_Stream_Wr_Fab#(datawidth, userwidth) fab;
-  interface Put#(AXI4_Stream_Pkg#(datawidth, userwidth)) pkg;
+  interface AXI4_Stream_Wr_Fab#(datawidth, userwidth, idwidth, destwidth) fab;
+  interface Put#(AXI4_Stream_Pkg#(datawidth, userwidth, idwidth, destwidth)) pkg;
 endinterface
 
-module mkAXI4_Stream_Wr#(Integer bufferSize)(AXI4_Stream_Wr#(datawidth, userwidth))
+module mkAXI4_Stream_Wr#(Integer bufferSize)(AXI4_Stream_Wr#(datawidth, userwidth, idwidth, destwidth))
 	provisos(Div#(datawidth, 8, keepwidth));
 
     let isRst <- isResetAsserted();
 
-	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth)) out;
+	FIFOF#(AXI4_Stream_Pkg#(datawidth, userwidth, idwidth, destwidth)) out;
 	if(bufferSize == 0)
 		out <- mkBypassFIFOF();
 	else if(bufferSize == 1)
@@ -141,8 +141,8 @@ module mkAXI4_Stream_Wr#(Integer bufferSize)(AXI4_Stream_Wr#(datawidth, userwidt
 	Wire#(Bit#(datawidth)) tdataOut <- mkDWire(unpack(0));
 	Wire#(Bit#(userwidth)) tuserOut <- mkDWire(unpack(0));
 	Wire#(Bit#(keepwidth)) tkeepOut <- mkDWire(unpack(0));
-	Wire#(Bit#(4)) tdestOut <- mkDWire(unpack(0));
-	Wire#(Bit#(8)) tidOut <- mkDWire(unpack(0));
+	Wire#(Bit#(destwidth)) tdestOut <- mkDWire(unpack(0));
+	Wire#(Bit#(idwidth)) tidOut <- mkDWire(unpack(0));
 	Wire#(Bool) tlastOut <- mkDWire(False);
 
 	rule deqFIFO if(!isRst && treadyIn && out.notEmpty());
@@ -176,7 +176,7 @@ endmodule
 DUMMY
 ========================
 */
-module mkAXI4_Stream_Wr_Dummy(AXI4_Stream_Wr#(datawidth, userwidth));
+module mkAXI4_Stream_Wr_Dummy(AXI4_Stream_Wr#(datawidth, userwidth, idwidth, destwidth));
 	interface AXI4_Stream_Wr_Fab fab;
 		interface tvalid = False;
 		interface tdata = 0;
@@ -189,12 +189,12 @@ module mkAXI4_Stream_Wr_Dummy(AXI4_Stream_Wr#(datawidth, userwidth));
 		endmethod
 	endinterface
 	interface Put pkg;
-		method Action put(AXI4_Stream_Pkg#(datawidth, userwidth) p);
+		method Action put(AXI4_Stream_Pkg#(datawidth, userwidth, idwidth, destwidth) p);
 		endmethod
 	endinterface
 endmodule
 
-module mkAXI4_Stream_Rd_Dummy(AXI4_Stream_Rd#(datawidth, userwidth));
+module mkAXI4_Stream_Rd_Dummy(AXI4_Stream_Rd#(datawidth, userwidth, idwidth, destwidth));
 	interface AXI4_Stream_Rd_Fab fab;
 		interface tready = False;
   		method Action ptvalid(Bool tvalid);
@@ -205,16 +205,16 @@ module mkAXI4_Stream_Rd_Dummy(AXI4_Stream_Rd#(datawidth, userwidth));
   		endmethod
   		method Action ptkeep(Bit#(TDiv#(datawidth, 8)) keep);
   		endmethod
-  		method Action ptDest(Bit#(4) dest);
+  		method Action ptDest(Bit#(destwidth) dest);
   		endmethod
-		method Action ptid(Bit#(8) id);
+		method Action ptid(Bit#(idwidth) id);
 		endmethod
   		method Action ptlast(Bool last);
   		endmethod
 	endinterface
 
 	interface Get pkg;
-		method ActionValue#(AXI4_Stream_Pkg#(datawidth, userwidth)) get();
+		method ActionValue#(AXI4_Stream_Pkg#(datawidth, userwidth, idwidth, destwidth)) get();
 			return unpack(0);
 		endmethod
 	endinterface
@@ -226,8 +226,8 @@ endmodule
 ========================
 */
 
-instance Connectable#(AXI4_Stream_Wr_Fab#(datawidth, userwidth), AXI4_Stream_Rd_Fab#(datawidth, userwidth));
-	module mkConnection#(AXI4_Stream_Wr_Fab#(datawidth, userwidth) wr, AXI4_Stream_Rd_Fab#(datawidth, userwidth) rd)(Empty);
+instance Connectable#(AXI4_Stream_Wr_Fab#(datawidth, userwidth, idwidth, destwidth), AXI4_Stream_Rd_Fab#(datawidth, userwidth, idwidth, destwidth));
+	module mkConnection#(AXI4_Stream_Wr_Fab#(datawidth, userwidth, idwidth, destwidth) wr, AXI4_Stream_Rd_Fab#(datawidth, userwidth, idwidth, destwidth) rd)(Empty);
 
 		rule forward1;
 			wr.ptready(rd.tready());
