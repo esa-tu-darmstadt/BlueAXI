@@ -7,9 +7,54 @@ import Vector :: *;
 import List :: *;
 import BUtils :: *;
 import BRAM :: *;
+import RegFile :: *;
 
 import AXI4_Lite_Types :: *;
 import AXI4_Lite_Slave :: *;
+
+function List#(RegisterOperator#(axiAddrWidth, axiDataWidth)) regfileHandler(Integer start, Integer elements, RegFile#(a, d) r, List#(RegisterOperator#(axiAddrWidth, axiDataWidth)) op)
+    provisos(
+        Bits#(a, a_sz),
+        Bits#(d, axiDataWidth),
+        Div#(axiDataWidth, 8, n),
+        Mul#(TDiv#(axiDataWidth, 8), 8, axiDataWidth)
+    );
+    let length = elements * valueOf(n);
+    op = List::cons(tagged ReadRange ReadOperationRange { index_min: fromInteger(start),
+                                                                        index_max: fromInteger((start + length) - 1),
+                                                                        fun: regFileReader(start, r)}, op);
+
+    op = List::cons(tagged WriteRange WriteOperationRange { index_min: fromInteger(start),
+                                                            index_max: fromInteger((start + length) - 1),
+                                                            fun: regFileWriter(start, r) }, op);
+    return op;
+endfunction
+
+function ActionValue#(Bit#(data_width)) regFileReader(Integer start, RegFile#(a,d) r, Bit#(addr_w) addr, AXI4_Lite_Prot p)
+    provisos(Bits#(a, a_sz),Bits#(d,data_width));
+    actionvalue
+        addr = addr - fromInteger(start);
+        Bit#(a_sz) regNum = zExtend(addr >> valueOf(TLog#(TDiv#(data_width, 8))));
+        return pack(r.sub(unpack(regNum)));
+    endactionvalue
+endfunction
+
+function Action regFileWriter(Integer start, RegFile#(a,d) r, Bit#(addr_w) addr,
+    Bit#(data_width) d, Bit#(TDiv#(data_width, 8)) s, AXI4_Lite_Prot p)
+    provisos(Bits#(a, a_sz),Bits#(d,data_width),Mul#(TDiv#(data_width, 8), 8, data_width));
+    action
+        addr = addr - fromInteger(start);
+        Bit#(a_sz) regNum = zExtend(addr >> valueOf(TLog#(TDiv#(data_width, 8))));
+        Vector#(TDiv#(data_width, 8), Bit#(8)) tr = cExtend(r.sub(unpack(regNum)));
+        Vector#(TDiv#(data_width, 8), Bit#(8)) td = unpack(d);
+        for(Integer i = 0; i < valueOf(TDiv#(data_width, 8)); i = i + 1) begin
+            if(unpack(s[i])) begin
+                tr[i] = td[i];
+            end
+        end
+        r.upd(unpack(regNum), unpack(pack(tr)));
+    endaction
+endfunction
 
 function List#(RegisterOperator#(axiAddrWidth, axiDataWidth)) bramHandler(Integer start, Integer elements, BRAMServerBE#(a, t, n) r, List#(RegisterOperator#(axiAddrWidth, axiDataWidth)) op)
     provisos(Bits#(a, a_sz),

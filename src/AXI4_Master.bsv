@@ -326,74 +326,6 @@ interface TestIfc;
 //    (*prefix="S_AXI"*)interface AXI4_Slave_Rd_Fab#(32, 32, 1, 1) s_rd;
 endinterface
 
-module mkTestIfc(TestIfc);
-    AXI4_Master_Wr#(32, 32, 1, 1) master_wr <- mkAXI4_Master_Wr(2, 2, 2, True);
-    AXI4_Master_Rd#(32, 32, 1, 1) master_rd <- mkAXI4_Master_Rd(2, 2, True);
-
-    AXI4_Slave_Wr#(32, 32, 1, 1) slave_wr <- mkAXI4_Slave_Wr(2, 2, 2);
-    AXI4_Slave_Rd#(32, 32, 1, 1) slave_rd <- mkAXI4_Slave_Rd(2, 2);
-
-    mkConnection(master_rd.fab, slave_rd.fab);
-    mkConnection(master_wr.fab, slave_wr.fab);
-
-    //interface m_wr = master_wr.fab;
-    //interface m_rd = master_rd.fab;
-
-    //interface s_wr = slave_wr.fab;
-    //interface s_rd = slave_rd.fab;
-endmodule
-
-/*
-========================
-    Connectable
-========================
-*/
-instance Connectable#(AXI4_Master_Rd_Fab#(addrwidth, datawidth, id_width, user_width), AXI4_Slave_Rd_Fab#(addrwidth, datawidth, id_width, user_width));
-    module mkConnection#(AXI4_Master_Rd_Fab#(addrwidth, datawidth, id_width, user_width) master, AXI4_Slave_Rd_Fab#(addrwidth, datawidth, id_width, user_width) slave)(Empty);
-        rule forward1; master.parready(slave.arready); endrule
-        rule forward2; slave.parvalid(master.arvalid); endrule
-        rule forward3;
-            slave.parchannel(master.arid, master.araddr, master.arlen, master.arsize, master.arburst,
-                master.arlock, master.arcache, master.arprot, master.arqos, master.arregion, master.aruser);
-        endrule
-
-        rule forward4; master.prvalid(slave.rvalid); endrule
-        rule forward5; slave.prready(master.rready); endrule
-
-        rule forward6;
-            master.prchannel(slave.rid, slave.rdata, slave.rresp, slave.rlast, slave.ruser);
-        endrule
-    endmodule
-endinstance
-
-instance Connectable#(AXI4_Slave_Rd_Fab#(addrwidth, datawidth, id_width, user_width), AXI4_Master_Rd_Fab#(addrwidth, datawidth, id_width, user_width));
-    module mkConnection#(AXI4_Slave_Rd_Fab#(addrwidth, datawidth, id_width, user_width) slave, AXI4_Master_Rd_Fab#(addrwidth, datawidth, id_width, user_width) master)(Empty);
-        mkConnection(master, slave);
-    endmodule
-endinstance
-
-instance Connectable#(AXI4_Master_Wr_Fab#(addrwidth, datawidth, id_width, user_width), AXI4_Slave_Wr_Fab#(addrwidth, datawidth, id_width, user_width));
-    module mkConnection#(AXI4_Master_Wr_Fab#(addrwidth, datawidth, id_width, user_width) master, AXI4_Slave_Wr_Fab#(addrwidth, datawidth, id_width, user_width) slave)(Empty);
-        rule forward1; master.pawready(slave.awready); endrule
-        rule forward2; slave.pawvalid(master.awvalid); endrule
-        rule forward3; slave.pawchannel(master.awid, master.awaddr, master.awlen, master.awsize, master.awburst, master.awlock, master.awcache, master.awprot, master.awqos, master.awregion, master.awuser); endrule
-
-        rule forward4; master.pwready(slave.wready); endrule
-        rule forward5; slave.pwvalid(master.wvalid); endrule
-        rule forward6; slave.pwchannel(master.wdata, master.wstrb, master.wlast, master.wuser); endrule
-
-        rule forward7; master.pbvalid(slave.bvalid); endrule
-        rule forward8; slave.pbready(master.bready); endrule
-        rule forward9; master.bin(slave.bresp, slave.bid, slave.buser); endrule
-    endmodule
-endinstance
-
-instance Connectable#(AXI4_Slave_Wr_Fab#(addrwidth, datawidth, id_width, user_width), AXI4_Master_Wr_Fab#(addrwidth, datawidth, id_width, user_width));
-    module mkConnection#(AXI4_Slave_Wr_Fab#(addrwidth, datawidth, id_width, user_width) slave, AXI4_Master_Wr_Fab#(addrwidth, datawidth, id_width, user_width) master)(Empty);
-        mkConnection(master, slave);
-    endmodule
-endinstance
-
 module mkAXI4_Master_Rd_Dummy(AXI4_Master_Rd#(addrwidth, datawidth, id_width, user_width));
     interface AXI4_Master_Rd_Fab fab;
         interface arvalid = False;
@@ -423,6 +355,9 @@ module mkAXI4_Master_Rd_Dummy(AXI4_Master_Rd#(addrwidth, datawidth, id_width, us
         method Action parready(Bool a);
         endmethod
   endinterface
+  interface response = ?;
+  interface snoop = ?;
+  interface request = ?;
 endmodule
 
 module mkAXI4_Master_Wr_Dummy(AXI4_Master_Wr#(addrwidth, datawidth, id_width, user_width));
@@ -457,6 +392,10 @@ module mkAXI4_Master_Wr_Dummy(AXI4_Master_Wr#(addrwidth, datawidth, id_width, us
         method Action bin(AXI4_Response r, Bit#(id_width) bid, Bit#(user_width) buser);
         endmethod
     endinterface
+	interface response = ?;
+	interface snoop = ?;
+	interface request_data = ?;
+	interface request_addr = ?;
 endmodule
 
 // Helper functions to simplify usage of the above modules
