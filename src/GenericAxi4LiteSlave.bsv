@@ -2,7 +2,6 @@ package GenericAxi4LiteSlave;
 
 import GetPut :: *;
 import FIFO :: *;
-import SpecialFIFOs :: *;
 import Vector :: *;
 import List :: *;
 import BUtils :: *;

@@ -3,7 +3,6 @@ package GenericAxi4Master;
 import GetPut :: *;
 import ClientServer :: *;
 import FIFO :: *;
-import FIFOF :: *;
 import BRAMFIFO :: *;
 import SpecialFIFOs :: *;
 import Vector :: *;

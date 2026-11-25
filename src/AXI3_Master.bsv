@@ -1,7 +1,6 @@
 package AXI3_Master;
 
 import GetPut :: *;
-import FIFO :: *;
 import FIFOF :: *;
 import SpecialFIFOs :: *;
 import BRAMFIFO :: *;

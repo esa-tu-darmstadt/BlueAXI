@@ -1,6 +1,5 @@
 package AXI3_Types;
 
-import DefaultValue :: *;
 
 /*
 =============

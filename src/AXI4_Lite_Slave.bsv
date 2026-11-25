@@ -3,7 +3,6 @@ package AXI4_Lite_Slave;
 import GetPut :: *;
 import FIFOF :: *;
 import SpecialFIFOs :: *;
-import Connectable :: *;
 import Clocks :: *;
 
 // Project specific
