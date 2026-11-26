@@ -5,7 +5,6 @@ import BUtils :: *;
 
 import AXI4_Types :: *;
 import AXI4_Slave :: *;
-import BlueLib :: *;
 
 interface BlueAXIBRAM#(numeric type addr_width, numeric type data_width, numeric type id_width);
     interface AXI4_Slave_Rd_Fab#(addr_width, data_width, id_width, 0) rd;

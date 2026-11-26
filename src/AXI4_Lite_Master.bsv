@@ -263,26 +263,49 @@ endinstance
 
 module mkAXI4_Lite_Master_Rd_Dummy(AXI4_Lite_Master_Rd#(addrwidth, datawidth));
     interface AXI4_Lite_Master_Rd_Fab fab;
-    	interface arvalid = False;
-    	interface araddr = unpack(0);
-    	interface arprot = unpack(0);
-
-    	interface rready = False;
+        method arvalid      = False;
+        method parready(a)  = noAction;
+        method araddr       = unpack(0);
+        method arprot       = unpack(0);
+        method rready       = False;
+        method prvalid(v)   = noAction;
+        method prdata(d)    = noAction;
+        method prresp(resp) = noAction;
     endinterface
+
+    interface Put request;
+        method put(value) if(False) = noAction;
+    endinterface
+
+    interface Get response;
+        method get() if(False) = actionvalue return unpack(0); endactionvalue;
+    endinterface
+
 endmodule
 
 module mkAXI4_Lite_Master_Wr_Dummy(AXI4_Lite_Master_Wr#(addrwidth, datawidth));
     interface AXI4_Lite_Master_Wr_Fab fab;
-    	interface awvalid = False;
-    	interface awaddr = unpack(0);
-    	interface awprot = unpack(0);
-
-    	interface wvalid = False;
-    	interface wdata = unpack(0);
-    	interface wstrb = unpack(0);
-
-    	interface bready = False;
+        method pawready(r) = noAction;
+        method awvalid     = False;
+        method awaddr      = unpack(0);
+        method awprot      = unpack(0);
+        method pwready(r)  = noAction;
+        method wvalid      = False;
+        method wdata       = unpack(0);
+        method wstrb       = unpack(0);
+        method pbvalid(b)  = noAction;
+        method bready      = False;
+        method pbresp(r)   = noAction;
     endinterface
+
+    interface Put request;
+        method put(value) if(False) = noAction;
+    endinterface
+
+    interface Get response;
+        method get() if(False) = actionvalue return unpack(0); endactionvalue;
+    endinterface
+
 endmodule
 
 function Action axi4_lite_write(AXI4_Lite_Master_Wr#(a, d) m,

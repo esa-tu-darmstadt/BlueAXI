@@ -4,7 +4,6 @@ import FIFO :: *;
 import GetPut :: *;
 
 import AXI4_Types :: *;
-import AXI4_Lite_Types :: *;
 
 (* always_ready, always_enabled *)
 interface AXI4_Monitor_Rd_Fab#(numeric type addrwidth, numeric type datawidth, numeric type id_width, numeric type user_width);
